@@ -13,6 +13,8 @@ type Client struct {
 
 func New(server string, certFile string, keyFile string, caFile string) (*Client, error) {
 
+	// TODO: make caFile optional; fallback to system certificate bundle if not provided
+
 	c, err := kc.NewClientFromFile(certFile, keyFile, caFile) // TODO: provide wrapper for the option without file
 	if err != nil {
 		return nil, err
