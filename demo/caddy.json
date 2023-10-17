@@ -1,0 +1,60 @@
+{
+  "apps": {
+    "tls": {
+      "certificates": {
+        "keyless": {
+          "cert": "./server-client-comm/client.crt",
+          "key": "./server-client-comm/client.key",
+          "ca": "./server-client-comm/ca.crt",
+          "disable_verification": true,
+          "server": "127.0.0.1:7123",
+          "certificates": [
+            "./keyless-certs/server.crt"
+          ]
+        }
+      }
+    },
+    "http": {
+      "servers": {
+        "srv0": {
+          "listen": [
+            ":443"
+          ],
+          "routes": [
+            {
+              "match": [
+                {
+                  "host": [
+                    "127.0.0.1"
+                  ]
+                }
+              ],
+              "handle": [
+                {
+                  "handler": "subroute",
+                  "routes": [
+                    {
+                      "handle": [
+                        {
+                          "body": "Hello, world!\n",
+                          "handler": "static_response"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "terminal": true
+            }
+          ],
+          "tls_connection_policies": [
+            {}
+          ],
+          "automatic_https": {
+            "disable": true
+          }
+        }
+      }
+    }
+  }
+}
