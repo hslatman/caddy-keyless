@@ -24,10 +24,10 @@ import (
 )
 
 func init() {
-	caddy.RegisterModule(Keyless{})
+	caddy.RegisterModule(KeylessLoader{})
 }
 
-type Keyless struct {
+type KeylessLoader struct {
 	CertificateFile string `json:"cert"` // TODO: nest inside some kind of Auth block?
 	KeyFile         string `json:"key"`
 	CAFile          string `json:"ca"`
@@ -42,15 +42,15 @@ type Keyless struct {
 }
 
 // CaddyModule returns the Caddy module information.
-func (Keyless) CaddyModule() caddy.ModuleInfo {
+func (KeylessLoader) CaddyModule() caddy.ModuleInfo {
 	return caddy.ModuleInfo{
 		ID:  "tls.certificates.keyless",
-		New: func() caddy.Module { return new(Keyless) },
+		New: func() caddy.Module { return new(KeylessLoader) },
 	}
 }
 
 // Provision sets up the handler.
-func (m *Keyless) Provision(ctx caddy.Context) error {
+func (m *KeylessLoader) Provision(ctx caddy.Context) error {
 
 	m.logger = ctx.Logger(m)
 	defer m.logger.Sync()
@@ -73,7 +73,7 @@ func (m *Keyless) Provision(ctx caddy.Context) error {
 	return nil
 }
 
-func (m *Keyless) LoadCertificates() ([]caddytls.Certificate, error) {
+func (m *KeylessLoader) LoadCertificates() ([]caddytls.Certificate, error) {
 	// TODO: provide a custom layer on top of keyless to get the certificate from
 	// the keyless server too? Although it can be done manually, for now ...
 
@@ -104,7 +104,7 @@ func (m *Keyless) LoadCertificates() ([]caddytls.Certificate, error) {
 	return certs, nil
 }
 
-func (m *Keyless) loadCertificate(certFile string) (*caddytls.Certificate, error) {
+func (m *KeylessLoader) loadCertificate(certFile string) (*caddytls.Certificate, error) {
 	tlsCert, err := m.client.LoadTLSCertificate(certFile) // TODO: ensure SNI is also sent to remote, if possible?
 	cert := &caddytls.Certificate{
 		Certificate: tlsCert,
@@ -115,7 +115,7 @@ func (m *Keyless) loadCertificate(certFile string) (*caddytls.Certificate, error
 
 // Interface guards
 var (
-	_ caddy.Module               = (*Keyless)(nil)
-	_ caddy.Provisioner          = (*Keyless)(nil)
-	_ caddytls.CertificateLoader = (*Keyless)(nil)
+	_ caddy.Module               = (*KeylessLoader)(nil)
+	_ caddy.Provisioner          = (*KeylessLoader)(nil)
+	_ caddytls.CertificateLoader = (*KeylessLoader)(nil)
 )
